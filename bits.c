@@ -43,7 +43,7 @@ Bits newBits(int nbits)
 void freeBits(Bits b)
 {
 	// written by Leo
-	free(b->bitstring);		
+	free(b->bitstring);
 	free(b);
 }
 
@@ -51,12 +51,12 @@ void freeBits(Bits b)
 
 Bool bitIsSet(Bits b, int position)
 {
-	// written by Leo	
+	// written by Leo
 	assert(b != NULL);
 	assert(0 <= position && position < b->nbits);
-	
-	if (b->bitstring[position/8] & (1 << (position%8))) { return 1; }		
-	else { return 0; } 
+
+	if (b->bitstring[position/8] & (1 << (position%8))) { return 1; }
+	else { return 0; }
 }
 
 // check whether one Bits b1 is a subset of Bits b2
@@ -65,13 +65,13 @@ Bool isSubset(Bits b1, Bits b2)
 {
 	// written by Leo
 	assert(b1 != NULL && b2 != NULL);
-	assert(b1->nbytes == b2->nbytes);	
+	assert(b1->nbytes == b2->nbytes);
 	for (int i=0; i<b1->nbits; i++){
 		if (b1->bitstring[i/8] & (1 << (i%8))) {
 			if (b2->bitstring[i/8] & (1 << (i%8))) {
 				return FALSE;
-			}	
-		}		
+			}
+		}
 	}
 	return TRUE; // remove this
 }
@@ -129,7 +129,7 @@ void andBits(Bits b1, Bits b2)
 		}
 		else {
 			b1->bitstring[i/8] &= ~(1 << (i%8));
-		}		
+		}
 	}
 }
 
@@ -155,7 +155,16 @@ void orBits(Bits b1, Bits b2)
 void getBits(Page p, Offset pos, Bits b)
 {
 
-	for (int i=pos	
+	for (int i=pos; i<pos+b->nbytes;i++){
+		for (int j=0; j<8; j++){
+			//if (p->bitstring[i/8] & (1 << (j%8))) {
+			//	b->bitstring[position/8] |= (1 << (position%8))
+			//}
+			//else {
+
+			//}
+		}
+	}
 	//TODO
 }
 
