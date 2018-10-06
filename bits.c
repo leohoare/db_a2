@@ -6,6 +6,14 @@
 
 // Written by John Shepherd, September 2018
 
+
+
+
+
+// FIX CHANGES TO CHECKS? set bit appears to work
+
+
+
 #include <assert.h>
 #include "defs.h"
 #include "bits.h"
@@ -34,79 +42,108 @@ Bits newBits(int nbits)
 
 void freeBits(Bits b)
 {
-	//TODO
+	// written by Leo
+	free(b->bitstring);		
+	free(b);
 }
 
 // check if the bit at position is 1
 
 Bool bitIsSet(Bits b, int position)
 {
+	// written by Leo	
 	assert(b != NULL);
 	assert(0 <= position && position < b->nbits);
-	//TODO
-	return FALSE; // remove this
+	if ( (b->bitstring[position/8] &= (1 << (position%8)) != 0) ) { return 1; }		
+	else { return 0; } 
 }
 
 // check whether one Bits b1 is a subset of Bits b2
 
 Bool isSubset(Bits b1, Bits b2)
 {
+	// written by Leo
 	assert(b1 != NULL && b2 != NULL);
-	assert(b1->nbytes == b2->nbytes);
-	//TODO
-	return FALSE; // remove this
+	assert(b1->nbytes == b2->nbytes);	
+	for (int i=0; i<b1->nbits; i++){
+		if (b1->bitstring[i/8] && (1 << (i%8)) != 0) {
+			if (b2->bitstring[i/8] && (1 << (i%8)) != 0 ) {
+				return FALSE;
+			}	
+		}		
+	}
+	return TRUE; // remove this
 }
 
 // set the bit at position to 1
 
 void setBit(Bits b, int position)
 {
+	// written by Leo
 	assert(b != NULL);
 	assert(0 <= position && position < b->nbits);
-	//TODO
+	b->bitstring[position/8] |= (1 << (position%8));
 }
 
 // set all bits to 1
 
 void setAllBits(Bits b)
 {
+	// written by Leo
 	assert(b != NULL);
-	//TODO
+	for (int i=0; i<b->nbits; i++){
+		b->bitstring[i/8] |= (1 << (i%8));
+	}
 }
 
 // set the bit at position to 0
 
 void unsetBit(Bits b, int position)
 {
+	// written by Leo
 	assert(b != NULL);
 	assert(0 <= position && position < b->nbits);
-	//TODO
+	b->bitstring[position/8] &= ~(1 << (position%8));
 }
 
 // set all bits to 0
 
 void unsetAllBits(Bits b)
 {
+	// written by Leo
 	assert(b != NULL);
-	//TODO
+	memset(b->bitstring, 0, b->nbytes);
 }
 
 // bitwise AND ... b1 = b1 & b2
 
 void andBits(Bits b1, Bits b2)
 {
+	// written by leo
 	assert(b1 != NULL && b2 != NULL);
 	assert(b1->nbytes == b2->nbytes);
-	//TODO
+	for (int i=0; i<b1->nbits; i++){
+		if ((b1->bitstring[i/8] && (1 << (i%8)) != 0) && (b2->bitstring[i/8] && (1 << (i%8)) != 0)) {
+			b1->bitstring[i/8] |= (1 << (i%8));
+		}
+		else {
+			b1->bitstring[i/8] &= ~(1 << (i%8));
+		}		
+	}
 }
 
 // bitwise OR ... b1 = b1 | b2
 
 void orBits(Bits b1, Bits b2)
 {
+	// written by Leo
 	assert(b1 != NULL && b2 != NULL);
 	assert(b1->nbytes == b2->nbytes);
-	//TODO
+	for (int i=0; i<b1->nbits; i++){
+		if ( !(b1->bitstring[i/8] && (1 << (i%8)) != 0) && (b2->bitstring[i/8] && (1 << (i%8)) != 0)) {
+			b1->bitstring[i/8] |= (1 << (i%8));
+		}
+	}
 }
 
 
