@@ -54,7 +54,8 @@ Bool bitIsSet(Bits b, int position)
 	// written by Leo	
 	assert(b != NULL);
 	assert(0 <= position && position < b->nbits);
-	if ( (b->bitstring[position/8] &= (1 << (position%8)) != 0) ) { return 1; }		
+	
+	if (b->bitstring[position/8] & (1 << (position%8))) { return 1; }		
 	else { return 0; } 
 }
 
@@ -66,8 +67,8 @@ Bool isSubset(Bits b1, Bits b2)
 	assert(b1 != NULL && b2 != NULL);
 	assert(b1->nbytes == b2->nbytes);	
 	for (int i=0; i<b1->nbits; i++){
-		if (b1->bitstring[i/8] && (1 << (i%8)) != 0) {
-			if (b2->bitstring[i/8] && (1 << (i%8)) != 0 ) {
+		if (b1->bitstring[i/8] & (1 << (i%8))) {
+			if (b2->bitstring[i/8] & (1 << (i%8))) {
 				return FALSE;
 			}	
 		}		
@@ -123,7 +124,7 @@ void andBits(Bits b1, Bits b2)
 	assert(b1 != NULL && b2 != NULL);
 	assert(b1->nbytes == b2->nbytes);
 	for (int i=0; i<b1->nbits; i++){
-		if ((b1->bitstring[i/8] && (1 << (i%8)) != 0) && (b2->bitstring[i/8] && (1 << (i%8)) != 0)) {
+		if ((b1->bitstring[i/8] & (1 << (i%8))) && (b2->bitstring[i/8] & (1 << (i%8)))) {
 			b1->bitstring[i/8] |= (1 << (i%8));
 		}
 		else {
@@ -140,7 +141,7 @@ void orBits(Bits b1, Bits b2)
 	assert(b1 != NULL && b2 != NULL);
 	assert(b1->nbytes == b2->nbytes);
 	for (int i=0; i<b1->nbits; i++){
-		if ( !(b1->bitstring[i/8] && (1 << (i%8)) != 0) && (b2->bitstring[i/8] && (1 << (i%8)) != 0)) {
+		if ( !(b1->bitstring[i/8] & (1 << (i%8))) && (b2->bitstring[i/8] & (1 << (i%8)))) {
 			b1->bitstring[i/8] |= (1 << (i%8));
 		}
 	}
@@ -153,6 +154,8 @@ void orBits(Bits b1, Bits b2)
 
 void getBits(Page p, Offset pos, Bits b)
 {
+
+	for (int i=pos	
 	//TODO
 }
 
