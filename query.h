@@ -31,7 +31,7 @@ typedef struct _QueryRep {
 typedef struct _QueryRep *Query;
 
 Query startQuery(Reln, char *, char);
-void  scanAndDisplayMatchingTuples(Query);
+void  scanAndDisplayMatchingTuples(Query, char *);
 void  queryStats(Query);
 void  closeQuery(Query);
 

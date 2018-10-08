@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 	}
 
 	// scan selected pages to find matching tuples
-	scanAndDisplayMatchingTuples(q);
+	scanAndDisplayMatchingTuples(q,rname);
 
 	printf("Query Stats:\n"); queryStats(q);
 

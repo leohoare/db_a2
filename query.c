@@ -11,6 +11,7 @@
 #include "tsig.h"
 #include "psig.h"
 #include "bsig.h"
+#include <math.h>
 
 // check whether a query is valid for a relation
 // e.g. same number of attributes
@@ -52,10 +53,32 @@ Query startQuery(Reln r, char *q, char sigs)
 // search for matching tuples and show each
 // accumulate query stats
 
-void scanAndDisplayMatchingTuples(Query q)
+void scanAndDisplayMatchingTuples(Query q, char* file_name)
 {
+	// written by Leo
 	assert(q != NULL);
-	//TODO
+	for (int pid=0; pid<nPages(q->rel); pid++){
+		if (bitIsSet(q->pages,pid)){
+			Page p = getPage(dataFile(q->rel), pid);	
+			for (int tid = 0; tid<pageNitems(p); tid++){
+				// get tuple from page
+				Tuple t = getTupleFromPage(q->rel, p, tid);
+				// make copy of string
+				char qstring_copy[strlen(q->qstring)+1];
+				strcpy(qstring_copy,q->qstring);
+				// iterate through each qstring && tuple token
+				char *t_rest = t, *q_rest = qstring_copy;
+				char *t_tok, *q_tok;
+				while((t_tok = strtok_r(t_rest, ",", &t_rest)) &&
+					 (q_tok = strtok_r(q_rest, ",", &q_rest))){
+					// CHECK MATCH HERE
+					// ADD IN STATISTICS!!! 
+					printf("%s %s \n", t_tok, q_tok);
+				}				
+			}
+		}
+		// else ignore
+	}	
 }
 
 // print statistics on query

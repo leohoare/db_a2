@@ -154,18 +154,27 @@ void orBits(Bits b1, Bits b2)
 
 void getBits(Page p, Offset pos, Bits b)
 {
-
-	for (int i=pos; i<pos+b->nbytes;i++){
+	// written by Leo
+	assert(p!=NULL && b!=NULL);
+	Byte *ptr = addrInPage(p,pos,sizeof(b));		
+	
+	//for (int i=0; i<b->nbytes; i++){
+		
+	//}
+	printf("%i\n",*ptr);	
+/*
+	printf("%s\n",sizeof(p->nitems));
+	for (int i=0; i<b->nbytes; i++){
 		for (int j=0; j<8; j++){
-			//if (p->bitstring[i/8] & (1 << (j%8))) {
-			//	b->bitstring[position/8] |= (1 << (position%8))
-			//}
-			//else {
-
-			//}
+			if (p->items[(pos+i)/8] & (1 << (j))) {
+				b->bitstring[i/8] |= (1 << (j));
+			}
+			else {
+				b->bitstring[i/8] &= ~(1 << (j));
+			}
 		}
 	}
-	//TODO
+*/
 }
 
 // copy the bit-string array in a BitsRep

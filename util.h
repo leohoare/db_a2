@@ -9,5 +9,5 @@
 
 void fatal(char *, char *);
 int  iceil(int, int);
-
+//int log2_floor(Bits);
 #endif

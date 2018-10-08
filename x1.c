@@ -5,6 +5,7 @@
 #include "reln.h"
 #include "tuple.h"
 #include "bits.h"
+//#include "page.h"
 
 int main(int argc, char **argv)
 {
@@ -44,7 +45,7 @@ int main(int argc, char **argv)
 	printf("t=6: "); showBits(c); printf("\n");
 	unsetBit(b, 0);
 	andBits(c,b);
-
 	printf("t=6: "); showBits(c); printf("\n");
+	
 return 0;
 }
