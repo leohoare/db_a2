@@ -71,6 +71,12 @@ void scanAndDisplayMatchingTuples(Query q, char* file_name)
 				char *t_tok, *q_tok;
 				while((t_tok = strtok_r(t_rest, ",", &t_rest)) &&
 					 (q_tok = strtok_r(q_rest, ",", &q_rest))){
+					if (q_tok[0] != '?' && strlen(q_tok)>=1) {
+						printf("test query\n");
+					}
+					else {
+						printf("default_match\n");
+					}
 					// CHECK MATCH HERE
 					// ADD IN STATISTICS!!! 
 					printf("%s %s \n", t_tok, q_tok);
