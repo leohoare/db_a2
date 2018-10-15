@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
+#include <limits.h>
 
 void fatal(char *msg, char *usage)
 {
@@ -22,18 +22,4 @@ int iceil(int val, int base)
 	if (val%base > 0) ceil++;
 	return ceil;
 }
-/*
-int log2_floor(Bits x)
-{
-    #define NIMHTNOE0WNM(n) (((~(x>>n)+1)>>n)&n)
 
-    int res, n;
-
-    n = NIMHTNOE0WNM(16); res  = n; x >>= n;
-    n = NIMHTNOE0WNM( 8); res |= n; x >>= n;
-    n = NIMHTNOE0WNM( 4); res |= n; x >>= n;
-    n = NIMHTNOE0WNM( 2); res |= n; x >>= n;
-    n = NIMHTNOE0WNM( 1); res |= n;
-    return res;
-}
-*/

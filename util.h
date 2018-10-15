@@ -7,7 +7,9 @@
 #ifndef UTIL_H
 #define UTIL_H 1
 
+
 void fatal(char *, char *);
 int  iceil(int, int);
+
 //int log2_floor(Bits);
 #endif

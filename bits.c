@@ -87,7 +87,6 @@ void setBit(Bits b, int position)
 }
 
 // set all bits to 1
-
 void setAllBits(Bits b)
 {
 	// written by Leo

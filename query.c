@@ -13,6 +13,7 @@
 #include "bsig.h"
 #include <math.h>
 #include <stdbool.h>
+
 // check whether a query is valid for a relation
 // e.g. same number of attributes
 
@@ -56,6 +57,8 @@ Query startQuery(Reln r, char *q, char sigs)
 void scanAndDisplayMatchingTuples(Query q, char* file_name)
 {
 	// written by Leo
+	
+	// DIDNT USE Tuple Match!!!!
 	assert(q != NULL);
 	for (int pid=0; pid<nPages(q->rel); pid++){
 		if (bitIsSet(q->pages,pid)){
@@ -76,12 +79,11 @@ void scanAndDisplayMatchingTuples(Query q, char* file_name)
 					 (q_tok = strtok_r(q_rest, ",", &q_rest))){
 					if (q_tok[0] == '?' && strlen(q_tok)==1) {
 						// continue -> matches anything	
-						// printf("test query\n");
 					}
 					else {
 						if (strcmp(q_tok,t_tok) == 0){
 							// continue
-							printf("match\n");		
+							// printf("match\n");		
 						}
 						else {
 							q->ntuples++;
@@ -90,7 +92,6 @@ void scanAndDisplayMatchingTuples(Query q, char* file_name)
 
 						}
 					}
-					//printf("%s %s \n", t_tok, q_tok);
 				}
 				if (tuple_match == true) { false_match = false;}				
 			}
