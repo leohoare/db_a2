@@ -15,8 +15,13 @@ int main(int argc, char **argv)
 		for (int tid = 0; tid<pageNitems(p); tid++){
 			Tuple t = getTupleFromPage(r, p, tid);
 			Bits b = makeTupleSig(r, t);
-			if (b) {printf("yes tuple\n");}
-			else {printf("\n");}
+			showBits(b);
+			int n0, n1, tot; n0 = n1 = tot = 0;
+			for (int i = 0; i < tsigBits(r); i++) {
+				if (bitIsSet(b,i)) n1++; else n0++;
+			tot++;
+			}
+			printf("%d total, %d set, %d zero\n", tot, n1, n0);
 		}
 	}
 	//Tuple t = readTuple(r, stdin);
@@ -26,11 +31,5 @@ int main(int argc, char **argv)
 	//Tuple t = readTuple(r, stdin);
 	//}
 	//showBits(b); putchar('\n');
-	//int n0, n1, tot; n0 = n1 = tot = 0;
-	//for (int i = 0; i < tsigBits(r); i++) {
-	//	if (bitIsSet(b,i)) n1++; else n0++;
-	//	tot++;
-	//}
-	//printf("%d total, %d set, %d zero\n", tot, n1, n0);
 	return 0;
 }

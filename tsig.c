@@ -12,35 +12,22 @@
 #include "hash.h"
 
 
-// djb2 hash function
-/*
-unsigned long hash(const char *word) {
-	unsigned long  hashAddress = 5381;
-	for (int counter = 0; word[counter]!='\0'; counter++){
-    		hashAddress = ((hashAddress << 5) + hashAddress) + word[counter];
-	}
-	return hashAddress;
-}
-*/
-
-// by Leo written by John Shepard (in slides)
+// by Leo adjusted slides by John Shepard
 // assumes each attribute value bits is shorter than 32 bits?
-int codeword(char *attr_value, int m, int k)
+Bits codeword(char *attr_value, int m, int k)
 {
-        int nbits = 0; // count of set bits
-        int cword = 0;
-	//Bits cword = newBits(m); // assuming m <= 32 bits
-        srandom(hash_any(attr_value,256));
+	int nbits = 0; // count of set bits
+	Bits cword = newBits(m);
+	srandom(hash_any(attr_value,m));
         while (nbits < k) {
                 int i = random() % m;
-                if (((1 << i) & cword) == 0) {
-                        cword |= (1 << i);
-                        nbits++;
-                }
+		if ((1 << i) && !(bitIsSet(cword,i))) {
+			setBit(cword,i);	
+			nbits ++;
+		}
         }
         return cword; // m-bits with k 1-bits and m-k 0-bits
 }
-
 
 // make a tuple signature
 Bits makeTupleSig(Reln r, Tuple t)
@@ -50,14 +37,22 @@ Bits makeTupleSig(Reln r, Tuple t)
 	// iterate through each tuple
 	char *rest = t;
 	char *tok;
+	Bits tsig = newBits(tsigBits(r));
+	int counter = tsigBits(r) - tsigBits(r)/nAttrs(r);
 	while ((tok = strtok_r(rest, ",", &rest))){
-		// WHAT VALUES SHOULD WE SET FOR M and K
+		// WHAT VALUES SHOULD WE SET K? 
+		// NEED TO BACK CALCULATE FROM FALSE MATCH PROBABILITY?????
 		// SHOULD BE FORMULA FROM MY UNDERSTANDING
-		int cw = codeword(tok,12,2);
-		printf("%i\n",cw);	
+		Bits cw = codeword(tok, tsigBits(r)/nAttrs(r), 2); // HERE
+		for (int i=0; i<(tsigBits(r)/nAttrs(r)); i++){
+			if (bitIsSet(cw,i)){
+				setBit(tsig,i+counter);
+			}
+		}
+		counter -= tsigBits(r)/nAttrs(r);
+		// showBits(cw); 
 	}		
-	//TODO
-	return NULL;
+	return tsig;
 }
 
 // find "matching" pages using tuple signatures

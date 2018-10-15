@@ -87,6 +87,8 @@ void relationStats(Reln r);
 #define psigBits(REL)    (REL)->params.pm
 #define bsigBits(REL)    (REL)->params.bm
 
+#define TSIZE(REL)	 (REL)->params.tsigSize
+
 #define dataFile(REL)    (REL)->dataf
 #define tsigFile(REL)    (REL)->tsigf
 #define psigFile(REL)    (REL)->psigf
