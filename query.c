@@ -12,7 +12,7 @@
 #include "psig.h"
 #include "bsig.h"
 #include <math.h>
-
+#include <stdbool.h>
 // check whether a query is valid for a relation
 // e.g. same number of attributes
 
@@ -59,8 +59,11 @@ void scanAndDisplayMatchingTuples(Query q, char* file_name)
 	assert(q != NULL);
 	for (int pid=0; pid<nPages(q->rel); pid++){
 		if (bitIsSet(q->pages,pid)){
+			q->ntuppages++;	
 			Page p = getPage(dataFile(q->rel), pid);	
+			bool false_match = true;
 			for (int tid = 0; tid<pageNitems(p); tid++){
+				bool tuple_match = true;
 				// get tuple from page
 				Tuple t = getTupleFromPage(q->rel, p, tid);
 				// make copy of string
@@ -71,17 +74,27 @@ void scanAndDisplayMatchingTuples(Query q, char* file_name)
 				char *t_tok, *q_tok;
 				while((t_tok = strtok_r(t_rest, ",", &t_rest)) &&
 					 (q_tok = strtok_r(q_rest, ",", &q_rest))){
-					if (q_tok[0] != '?' && strlen(q_tok)>=1) {
-						printf("test query\n");
+					if (q_tok[0] == '?' && strlen(q_tok)==1) {
+						// continue -> matches anything	
+						// printf("test query\n");
 					}
 					else {
-						printf("default_match\n");
+						if (strcmp(q_tok,t_tok) == 0){
+							// continue
+							printf("match\n");		
+						}
+						else {
+							q->ntuples++;
+							tuple_match = false;
+							break;
+
+						}
 					}
-					// CHECK MATCH HERE
-					// ADD IN STATISTICS!!! 
-					printf("%s %s \n", t_tok, q_tok);
-				}				
+					//printf("%s %s \n", t_tok, q_tok);
+				}
+				if (tuple_match == true) { false_match = false;}				
 			}
+			if (false_match == true) { q->nfalse++; }
 		}
 		// else ignore
 	}	

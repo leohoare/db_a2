@@ -48,6 +48,8 @@ int main(int argc, char **argv)
 		fatal("",err);
 	}
 
+
+	// leo: possibly add in other functions for each search... tuples, pages etc
 	// scan selected pages to find matching tuples
 	scanAndDisplayMatchingTuples(q,rname);
 
