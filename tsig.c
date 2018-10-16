@@ -18,7 +18,7 @@ Bits codeword(char *attr_value, int m, int k)
 {
 	int nbits = 0; // count of set bits
 	Bits cword = newBits(m);
-	srandom(hash_any(attr_value,m));
+	srandom(hash_any(attr_value,strlen(attr_value)));
         while (nbits < k) {
                 int i = random() % m;
 		if ((1 << i) && !(bitIsSet(cword,i))) {
@@ -40,10 +40,7 @@ Bits makeTupleSig(Reln r, Tuple t)
 	Bits tsig = newBits(tsigBits(r));
 	int counter = tsigBits(r) - tsigBits(r)/nAttrs(r);
 	while ((tok = strtok_r(rest, ",", &rest))){
-		// WHAT VALUES SHOULD WE SET K? 
-		// NEED TO BACK CALCULATE FROM FALSE MATCH PROBABILITY?????
-		// SHOULD BE FORMULA FROM MY UNDERSTANDING
-		Bits cw = codeword(tok, tsigBits(r)/nAttrs(r), 2); // HERE
+		Bits cw = codeword(tok, tsigBits(r)/nAttrs(r), codeBits(r)); 
 		for (int i=0; i<(tsigBits(r)/nAttrs(r)); i++){
 			if (bitIsSet(cw,i)){
 				setBit(tsig,i+counter);

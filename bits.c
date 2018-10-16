@@ -158,9 +158,15 @@ void getBits(Page p, Offset pos, Bits b)
 	// NOT SURE IF sizeof(Byte) is correct???
 	Byte *ptr = addrInPage(p,pos,sizeof(Byte));		
 	for (int i=0; i<b->nbytes; i++){
-		Byte byte = ptr[i];
+	//	Byte *ptr = addrInPage(p,pos+i,sizeof(Byte));		
+		//Byte byte = *ptr;
+		Byte byte = ptr[0];
+		printf("bits is '%u'\n",byte);
 		for (int j=0; j<8; j++){
+			if (byte) {printf("hi\n");}
+			
 			if (byte & (1 << (j))) {
+				printf("Here!");
 				b->bitstring[i/8] |= (1 << (j));
 			}
 			else {
@@ -176,20 +182,35 @@ void getBits(Page p, Offset pos, Bits b)
 
 void putBits(Page p, Offset pos, Bits b)
 {
+	// by leo
 	assert(p!=NULL && b!=NULL);
 	// NOT SURE IF sizeof(Byte) is correct???
 	Byte *ptr = addrInPage(p,pos,sizeof(Byte));		
+	
+	//Byte test = &ptr;
+	// Byte test = ptr[0];
+	// printf("hello %u\n",test );
 	for (int i=0; i<b->nbytes; i++){
+		//Byte *ptr = addrInPage(p,pos,sizeof(Byte));		
+		//Byte byte = *ptr;
 		Byte byte = ptr[i];
+		
 		for (int j=0; j<8; j++){
 			if (b->bitstring[i] & (1 << (j))) {
 				byte |= (1 << (j));
 			}
 			else {
 				byte &= ~(1 << (j));
-			}
+			}/*
+			if (byte & (1 <<(j)))
+				putchar('1');
+			else 
+				putchar('0');
+			*/
 		}
+		printf("put byte is '%u'\n",byte);
 	}
+	printf("\n");
 
 }
 // show Bits on stdout
