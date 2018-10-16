@@ -24,16 +24,33 @@ int main(int argc, char **argv)
 			}
 			printf("%d total, %d set, %d zero\n", tot, n1, n0);
 			putBits(tp, tid, b);
+			//Bits new = newBits(64);
+			//getBits(tp, tid, new);
+			//showBits(b); printf("\n");
+			//putPage(tsigFile(r), 0, tp);
 		}
-		//putPage(tsigFile(r),0,tp);
+		putPage(tsigFile(r),0,tp);
+		// Page test1 =getPage(tsigFile(r),0);
+		// if (test1 == tp){printf("\n\ninc\n");}
+		// putPage(tsigFile(r),0,tp);
 	}
-	
+		
 	Page testp = getPage(tsigFile(r),0);
 	Bits test = newBits(64);
 	getBits(testp, 0, test);
 	showBits(test);
-	
-
+	printf("\n");
+	getBits(testp, 1, test);
+	showBits(test);
+	printf("\n");
+	getBits(testp, 2, test);
+	showBits(test);
+	printf("\n");
+	getBits(testp, 3, test);
+	showBits(test);
+	printf("\n");
+	getBits(testp, 4, test);
+	showBits(test);
 	//Byte *ptr = addrInPage(tp,0,sizeof(Byte));
 		
 	//Tuple t = readTuple(r, stdin);

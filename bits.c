@@ -156,17 +156,17 @@ void getBits(Page p, Offset pos, Bits b)
 	// written by Leo
 	assert(p!=NULL && b!=NULL);
 	// NOT SURE IF sizeof(Byte) is correct???
-	Byte *ptr = addrInPage(p,pos,sizeof(Byte));		
+	// ????? sizeof(tuple) in add tuple case)
+	Byte *ptr = addrInPage(p,pos,sizeof(Byte)*b->nbytes);		
+	memcpy(b->bitstring, ptr, sizeof(Byte)*(b->nbytes));
+	/*
 	for (int i=0; i<b->nbytes; i++){
-	//	Byte *ptr = addrInPage(p,pos+i,sizeof(Byte));		
+		//Byte *ptr = addrInPage(p,pos+i,sizeof(Byte));		
 		//Byte byte = *ptr;
-		Byte byte = ptr[0];
+		//Byte byte = ptr[0];
 		printf("bits is '%u'\n",byte);
 		for (int j=0; j<8; j++){
-			if (byte) {printf("hi\n");}
-			
 			if (byte & (1 << (j))) {
-				printf("Here!");
 				b->bitstring[i/8] |= (1 << (j));
 			}
 			else {
@@ -174,6 +174,7 @@ void getBits(Page p, Offset pos, Bits b)
 			}
 		}
 	}
+	*/
 
 }
 
@@ -185,15 +186,18 @@ void putBits(Page p, Offset pos, Bits b)
 	// by leo
 	assert(p!=NULL && b!=NULL);
 	// NOT SURE IF sizeof(Byte) is correct???
-	Byte *ptr = addrInPage(p,pos,sizeof(Byte));		
+	Byte *ptr = addrInPage(p,pos,sizeof(Byte)*b->nbytes);		
+	memcpy(ptr, b->bitstring, sizeof(Byte)*b->nbytes);
 	
+
 	//Byte test = &ptr;
 	// Byte test = ptr[0];
-	// printf("hello %u\n",test );
+	// check against datafiel doesn't appear to be right 
+	/*
 	for (int i=0; i<b->nbytes; i++){
-		//Byte *ptr = addrInPage(p,pos,sizeof(Byte));		
-		//Byte byte = *ptr;
-		Byte byte = ptr[i];
+		Byte *ptr = addrInPage(p,pos+i,sizeof(Byte));		
+		Byte byte = *ptr;
+		//Byte byte = ptr[i];
 		
 		for (int j=0; j<8; j++){
 			if (b->bitstring[i] & (1 << (j))) {
@@ -201,17 +205,18 @@ void putBits(Page p, Offset pos, Bits b)
 			}
 			else {
 				byte &= ~(1 << (j));
-			}/*
+			}
 			if (byte & (1 <<(j)))
 				putchar('1');
 			else 
 				putchar('0');
-			*/
 		}
 		printf("put byte is '%u'\n",byte);
 	}
+	//putPage(0,0,p);
 	printf("\n");
 
+	*/
 }
 // show Bits on stdout
 // display in order MSB to LSB
