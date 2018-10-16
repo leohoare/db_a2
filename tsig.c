@@ -35,7 +35,9 @@ Bits makeTupleSig(Reln r, Tuple t)
 	// by Leo
 	assert(r != NULL && t != NULL);
 	// iterate through each tuple
-	char *rest = t;
+	char tCopy[strlen(t)];
+	strcpy(tCopy,t);
+	char *rest = tCopy;
 	char *tok;
 	Bits tsig = newBits(tsigBits(r));
 	int counter = tsigBits(r) - tsigBits(r)/nAttrs(r);
@@ -51,20 +53,59 @@ Bits makeTupleSig(Reln r, Tuple t)
 	return tsig;
 }
 
+// takes query and turns it into tup sig
+Bits tupSigForQuery (Query q){
+	// by Leo
+	char qCopy[strlen(q->qstring)];
+	strcpy(qCopy,q->qstring);
+	char *tok, *rest = qCopy;
+	Bits tsig = newBits(tsigBits(q->rel));
+	int counter = tsigBits(q->rel) - tsigBits(q->rel)/nAttrs(q->rel);
+	while ((tok = strtok_r(rest, ",", &rest))) {
+		if (tok[0] == '?' && strlen(tok) == 1) {
+			//skip already set to 0's					
+		}
+		else {
+			Bits cw = codeword(tok, tsigBits(q->rel)/nAttrs(q->rel), codeBits(q->rel)); 
+			for (int i=0; i<(tsigBits(q->rel)/nAttrs(q->rel)); i++){
+				if (bitIsSet(cw,i)){
+					setBit(tsig,i+counter);
+				}
+			}
+		}
+		counter -= tsigBits(q->rel)/nAttrs(q->rel);
+	}
+	return tsig;
+}
+
+
 // find "matching" pages using tuple signatures
 
 void findPagesUsingTupSigs(Query q)
 {
 	assert(q != NULL);
-	//TODO
+	// tuple number used for marking page bit
+	int tup_num = 0;
+	// create bit string from Query
+	Bits qtsig = tupSigForQuery(q);
+	// iterate through tsig pages
+	for (int pid=0; pid<nTsigPages(q->rel); pid++){
+		Page tp = getPage(tsigFile(q->rel), pid);
+		q->nsigpages++;
+		// iterate through tsigs in page
+		for (int tid = 0; tid<pageNitems(tp); tid++ ){
+			q->nsigs++;
+			Bits ttsig = newBits(tsigBits(q->rel));
+			getBits(tp, tid, ttsig);
+			// test if tsig matches
+			if (isSubset(ttsig, qtsig)) {
+				// set page accordingly
+				setBit(q->pages, tup_num/pageNitems(tp));
+			}
+			tup_num++;
+		}
+	}	
 	
-
-
-
-	
-	setAllBits(q->pages); // remove this
-
-	// The printf below is primarily for debugging
 	// Remove it before submitting this function
 	printf("Matched Pages:"); showBits(q->pages); putchar('\n');
 }

@@ -66,11 +66,9 @@ Bool isSubset(Bits b1, Bits b2)
 	// written by Leo
 	assert(b1 != NULL && b2 != NULL);
 	assert(b1->nbytes == b2->nbytes);
-	for (int i=0; i<b1->nbits; i++){
-		if (b1->bitstring[i/8] & (1 << (i%8))) {
-			if (b2->bitstring[i/8] & (1 << (i%8))) {
-				return FALSE;
-			}
+	for (int i=0; i<b2->nbits; i++){
+		if (bitIsSet(b2,i) == 1 && bitIsSet(b1,i) == 0){
+			return FALSE;
 		}
 	}
 	return TRUE; // remove this

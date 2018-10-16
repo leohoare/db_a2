@@ -10,6 +10,7 @@
 int main(int argc, char **argv)
 {
 	Reln r = openRelation("R");
+	/*
 	for (int pid=0; pid<nPages(r); pid++){
 		Page p = getPage(dataFile(r), pid);
 		Page tp = getPage(tsigFile(r),0);
@@ -28,7 +29,7 @@ int main(int argc, char **argv)
 		}
 		putPage(tsigFile(r),0,tp);
 	}
-		
+	*/	
 	Page testp = getPage(tsigFile(r),0);
 	Bits test = newBits(64);
 	getBits(testp, 0, test);

@@ -70,11 +70,14 @@ void scanAndDisplayMatchingTuples(Query q, char* file_name)
 				// get tuple from page
 				Tuple t = getTupleFromPage(q->rel, p, tid);
 				// make copy of string
-				char qstring_copy[strlen(q->qstring)+1];
+				char qstring_copy[strlen(q->qstring)];
 				strcpy(qstring_copy,q->qstring);
 				// iterate through each qstring && tuple token
 				char *t_rest = t, *q_rest = qstring_copy;
 				char *t_tok, *q_tok;
+				// increment tuples by 1.
+				// CASE FOR ?,?,?,? open relation? still read tuples?
+				q->ntuples++;
 				while((t_tok = strtok_r(t_rest, ",", &t_rest)) &&
 					 (q_tok = strtok_r(q_rest, ",", &q_rest))){
 					if (q_tok[0] == '?' && strlen(q_tok)==1) {
@@ -86,16 +89,18 @@ void scanAndDisplayMatchingTuples(Query q, char* file_name)
 							// printf("match\n");		
 						}
 						else {
-							q->ntuples++;
+							// Tuple doesn't match
 							tuple_match = false;
 							break;
-
 						}
 					}
 				}
+				// If the tuple matches it isn't a false match
 				if (tuple_match == true) { false_match = false;}				
 			}
+			// if no tuples match -> false match
 			if (false_match == true) { q->nfalse++; }
+			
 		}
 		// else ignore
 	}	
