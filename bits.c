@@ -155,17 +155,12 @@ void getBits(Page p, Offset pos, Bits b)
 {
 	// written by Leo
 	assert(p!=NULL && b!=NULL);
-	Byte *ptr = addrInPage(p,pos,sizeof(b));		
-	
-	//for (int i=0; i<b->nbytes; i++){
-		
-	//}
-	printf("%i\n",*ptr);	
-/*
-	printf("%s\n",sizeof(p->nitems));
+	// NOT SURE IF sizeof(Byte) is correct???
+	Byte *ptr = addrInPage(p,pos,sizeof(Byte));		
 	for (int i=0; i<b->nbytes; i++){
+		Byte byte = ptr[i];
 		for (int j=0; j<8; j++){
-			if (p->items[(pos+i)/8] & (1 << (j))) {
+			if (byte & (1 << (j))) {
 				b->bitstring[i/8] |= (1 << (j));
 			}
 			else {
@@ -173,7 +168,7 @@ void getBits(Page p, Offset pos, Bits b)
 			}
 		}
 	}
-*/
+
 }
 
 // copy the bit-string array in a BitsRep
@@ -181,9 +176,22 @@ void getBits(Page p, Offset pos, Bits b)
 
 void putBits(Page p, Offset pos, Bits b)
 {
-	//TODO
-}
+	assert(p!=NULL && b!=NULL);
+	// NOT SURE IF sizeof(Byte) is correct???
+	Byte *ptr = addrInPage(p,pos,sizeof(Byte));		
+	for (int i=0; i<b->nbytes; i++){
+		Byte byte = ptr[i];
+		for (int j=0; j<8; j++){
+			if (b->bitstring[i] & (1 << (j))) {
+				byte |= (1 << (j));
+			}
+			else {
+				byte &= ~(1 << (j));
+			}
+		}
+	}
 
+}
 // show Bits on stdout
 // display in order MSB to LSB
 // do not append '\n'

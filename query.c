@@ -57,7 +57,7 @@ Query startQuery(Reln r, char *q, char sigs)
 void scanAndDisplayMatchingTuples(Query q, char* file_name)
 {
 	// written by Leo
-	
+	// DON'T KNOW IF CORRECT????	
 	// DIDNT USE Tuple Match!!!!
 	assert(q != NULL);
 	for (int pid=0; pid<nPages(q->rel); pid++){

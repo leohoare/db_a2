@@ -9,8 +9,18 @@
 
 int main(int argc, char **argv)
 {
-	Bits b = newBits(60);
-	
+	Reln r = openRelation("R");
+	//	File f = dataFile(r);
+	Bits b = newBits(10);
+	printf("%i\n",nPages(r));
+	for (int pid=0; pid<nPages(r); pid++){
+                printf("here: \n");
+		Page p = getPage(tsigFile(r), pid);
+		getBits(p,0,b);
+	}
+	/*
+
+	Bits b = newBits(60);	
 	printf("t=0: "); showBits(b); printf("\n");
 	setBit(b, 0);
 	printf("t=0: "); showBits(b); printf("\n");
@@ -46,6 +56,6 @@ int main(int argc, char **argv)
 	unsetBit(b, 0);
 	andBits(c,b);
 	printf("t=6: "); showBits(c); printf("\n");
-	
+	*/	
 return 0;
 }
