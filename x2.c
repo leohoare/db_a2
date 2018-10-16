@@ -17,6 +17,7 @@ int main(int argc, char **argv)
 			Tuple t = getTupleFromPage(r, p, tid);
 			Bits b = makeTupleSig(r, t);
 			showBits(b);
+			printf(" ");
 			int n0, n1, tot; n0 = n1 = tot = 0;
 			for (int i = 0; i < tsigBits(r); i++) {
 				if (bitIsSet(b,i)) n1++; else n0++;
@@ -24,15 +25,8 @@ int main(int argc, char **argv)
 			}
 			printf("%d total, %d set, %d zero\n", tot, n1, n0);
 			putBits(tp, tid, b);
-			//Bits new = newBits(64);
-			//getBits(tp, tid, new);
-			//showBits(b); printf("\n");
-			//putPage(tsigFile(r), 0, tp);
 		}
 		putPage(tsigFile(r),0,tp);
-		// Page test1 =getPage(tsigFile(r),0);
-		// if (test1 == tp){printf("\n\ninc\n");}
-		// putPage(tsigFile(r),0,tp);
 	}
 		
 	Page testp = getPage(tsigFile(r),0);
@@ -51,14 +45,5 @@ int main(int argc, char **argv)
 	printf("\n");
 	getBits(testp, 4, test);
 	showBits(test);
-	//Byte *ptr = addrInPage(tp,0,sizeof(Byte));
-		
-	//Tuple t = readTuple(r, stdin);
-	// match all tuples for now
-	//Tuple t;
-	//while ((t = readTuple(r,stdin)) != NULL) {
-	//Tuple t = readTuple(r, stdin);
-	//}
-	//showBits(b); putchar('\n');
 	return 0;
 }

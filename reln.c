@@ -116,7 +116,7 @@ void closeRelation(Reln r)
 PageID addToRelation(Reln r, Tuple t)
 {
 	assert(r != NULL && t != NULL && strlen(t) == tupSize(r));
-	Page p;  PageID pid;
+	Page p,tp;  PageID pid,tid;
 	RelnParams *rp = &(r->params);
 	
 	// add tuple to last page
@@ -137,9 +137,24 @@ PageID addToRelation(Reln r, Tuple t)
 
 	// compute tuple signature and add to tsigf
 	
+	// by Leo
+	tid = rp->tsigNpages;
+	tp = getPage(r->tsigf,tid);	
+	if (pageNitems(tp) == rp->tsigPP){
+		addPage(r->tsigf);
+		rp->tsigNpages++;
+		tid++;
+		free(tp);
+		tp = newPage();
+		if (tp == NULL) return NO_PAGE;
+	}
+	Bits tup_sig = makeTupleSig(r, t);	
+	putBits(tp, pageNitems(tp), tup_sig);
+	addOneItem(tp);
+	rp->ntsigs++;
+	putPage(r->tsigf, tid, tp);
 	
-	
-	//TODO
+
 	// compute page signature and add to psigf
 
 	//TODO

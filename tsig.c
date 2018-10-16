@@ -47,7 +47,6 @@ Bits makeTupleSig(Reln r, Tuple t)
 			}
 		}
 		counter -= tsigBits(r)/nAttrs(r);
-		// showBits(cw); 
 	}		
 	return tsig;
 }
@@ -58,7 +57,11 @@ void findPagesUsingTupSigs(Query q)
 {
 	assert(q != NULL);
 	//TODO
+	
 
+
+
+	
 	setAllBits(q->pages); // remove this
 
 	// The printf below is primarily for debugging
