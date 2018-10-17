@@ -9,7 +9,7 @@
 #include "reln.h"
 #include "hash.h"
 #include "bits.h"
-#include "hash.h"
+
 
 
 // by Leo adjusted slides by John Shepard

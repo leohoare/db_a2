@@ -159,7 +159,11 @@ PageID addToRelation(Reln r, Tuple t)
 
 	// compute page signature and add to psigf
 
-	//TODO
+	//TODO!!
+
+	/*
+	pid 
+	*/
 
 	// use page signature to update bit-slices
 
