@@ -9,8 +9,8 @@
 #include "reln.h"
 #include "hash.h"
 #include "bits.h"
+#include "util.h"
 #include "hash.h"
-
 
 // by Leo adjusted slides by John Shepard
 // assumes each attribute value bits is shorter than 32 bits?
@@ -83,6 +83,7 @@ Bits tupSigForQuery (Query q){
 
 void findPagesUsingTupSigs(Query q)
 {
+	// by Leo
 	assert(q != NULL);
 	// tuple number used for marking page bit
 	int tup_num = 0;
