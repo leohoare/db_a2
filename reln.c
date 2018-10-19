@@ -160,29 +160,35 @@ PageID addToRelation(Reln r, Tuple t)
 	
 
 	// compute page signature and add to psigf
-	
 	ppid = rp->psigNpages-1;
 	pp = getPage(r->psigf,ppid);
 	Bits add_sig = makePageSig(r, t);
 	Bits old_sig = newBits(psigBits(r));
-	if (pageNitems(pp) == rp->psigPP){
-		addPage(r->psigf);
-		rp->psigNpages++;
-		ppid++;
-		free(pp);
-		pp = newPage();
-		if (pp == NULL) return NO_PAGE;
-		//putBits(pp, pageNitems(pp),
+	// ADD NEW psig
+	if (pageNitems(p) == rp->tupPP || pageNitems(p) == 0 ){
+	        // ADD new page
+		if (pageNitems(pp) == rp->psigPP){
+            		addPage(r->psigf);
+               		rp->psigNpages++;
+               		ppid++;
+                	free(pp);
+                	pp = newPage();
+                	if (pp == NULL) return NO_PAGE;
+		// just add new sig
+		}
+		else {
+	
+		}
+		rp->npsigs++;
+		addOneItem(pp);
 	}
+	// merge signatures;
 	else {
 		getBits(pp, pageNitems(pp)-1, old_sig);
 		orBits(add_sig,old_sig);
 	}
 	putBits(pp, pageNitems(pp), add_sig);
-	rp->npsigs++;
-	addOneItem(pp);
 	putPage(r->psigf, ppid, pp);
-	
 	//TODO
 
 	// use page signature to update bit-slices

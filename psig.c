@@ -45,7 +45,7 @@ void findPagesUsingPageSigs(Query q)
 		}
 	}
 	
-
+	
 	for (int pid = 0; pid<nPsigPages(q->rel); pid++){
 		Page pp = getPage(psigFile(q->rel),pid);
 		q->nsigpages++;
@@ -56,12 +56,10 @@ void findPagesUsingPageSigs(Query q)
 			if (isSubset(psig, querysig)){
 				setBit(q->pages, psid + pid*maxPsigsPP(q->rel));
 			}
-			
 		}
 	}
-	
 
 	//TODO
-	setAllBits(q->pages); // remove this
+	//setAllBits(q->pages); // remove this
 }
 

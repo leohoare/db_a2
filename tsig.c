@@ -80,7 +80,9 @@ Bits tupSigForQuery (Query q){
 
 
 // find "matching" pages using tuple signatures
-
+// CALCULATION IS WRONG
+// e.g. ./select  R  1000001,?,?,?  t
+// scans 15...
 void findPagesUsingTupSigs(Query q)
 {
 	// by Leo
