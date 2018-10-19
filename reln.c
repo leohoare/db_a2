@@ -158,12 +158,24 @@ PageID addToRelation(Reln r, Tuple t)
 	
 
 	// compute page signature and add to psigf
-
-	//TODO!!
-
 	/*
-	pid 
+	pid = rp->psigNpages-1;
+	pp = getPage(r->psif,pid);
+	if (pageNitems(pp) == rp->psigPP){
+		addPage(r->psigf);
+		
+		rp->psigNpages++;
+		pid++;
+		free(pp);
+		pp = newPage();
+		if (pp == NULL) return NO_PAGE;
+	}
+	Bits add_sig = makePageSig(r, t);
+	putBits(pp, pageNitems(pp), add_sig);
+	addOneI 
+	}
 	*/
+	//TODO
 
 	// use page signature to update bit-slices
 
@@ -194,3 +206,4 @@ void relationStats(Reln r)
 	printf("  bsigs  size: %d bits (%d bytes)  max/page: %d\n",
 			p->bm, p->bsigSize, p->bsigPP);
 }
+

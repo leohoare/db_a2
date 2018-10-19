@@ -6,10 +6,10 @@
 
 #ifndef UTIL_H
 #define UTIL_H 1
+//#include "bits.h"
 
 
 void fatal(char *, char *);
 int  iceil(int, int);
-
 //int log2_floor(Bits);
 #endif

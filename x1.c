@@ -9,8 +9,18 @@
 
 int main(int argc, char **argv)
 {
+	
 	Reln r = openRelation("R");
+	Count tsize = 28 + 7*(nAttrs(r)-2);
+	printf("%i %i = %i\n",psigBits(r), tsigBits(r),
+		tsigBits(r)*((PAGESIZE-sizeof(Count))/(28 + 7 *(nAttrs(r)-2))));	
+
+	printf("%i %i %i \n", psigBits(r)/maxTupsPP(r), psigBits(r)/maxTupsPP(r)/nAttrs(r),codeBits(r));
+	printf("%i %i %i\n",tupSize(r),maxTsigsPP(r)*tsigBits(r),tsigBits(r));
+	printf("%i %i %i\n",psigBits(r)/8,psigBits(r)/tsize,maxTupsPP(r));
+		
 	//	File f = dataFile(r);
+	/*
 	Bits b = newBits(10);
 	printf("%i\n",nPages(r));
 	for (int pid=0; pid<nPages(r); pid++){
@@ -18,6 +28,7 @@ int main(int argc, char **argv)
 		Page p = getPage(tsigFile(r), pid);
 		getBits(p,0,b);
 	}
+	*/
 	/*
 
 	Bits b = newBits(60);	

@@ -10,7 +10,8 @@
 #include "reln.h"
 #include "bits.h"
 
+
 Bits makeTupleSig(Reln, Tuple);
 void findPagesUsingTupSigs(Query);
-
+Bits codeword(char *, int, int);
 #endif
