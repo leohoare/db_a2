@@ -48,7 +48,7 @@ int BitsPerTup (Reln r){
 //000101|1100101|0110110|1010101|0000000|0000000|0000000|0000000| length per tup = PsigBits(r)/MaxTupPP(r)
 //============================================================== codeBits(R) set per attr
 
-
+/*
 // by Leo adjusted slides by John Shepard
 // assumes each attribute value bits is shorter than 32 bits?
 Bits codeword(char *attr_value, int m, int k)
@@ -65,6 +65,7 @@ Bits codeword(char *attr_value, int m, int k)
         }
         return cword; // m-bits with k 1-bits and m-k 0-bits
 }
+*/
 
 /*
 QuerySig = makePageSig(Query)
@@ -104,25 +105,80 @@ Bits makePageSig(Reln r, Tuple t)
 }
 
 */
+
+//get codeword for each attr in each tuple, OR them
+//then generate a bit-string of matching pages 
 Bits makePageSig(Reln r, Tuple t){
+	assert(r != NULL && t != NULL);
 	char **tuple = tupleVals(r,t);
-	for (int i; i < strlen(tuple); i++){
+	Bits psig = newBits(psigBits(r));
+	//printf("Here\n");
+	//printf("NumAttr is %d\n", nAttrs(r));
+	//Bits firstAttr = codeword(tuple[0], psigBits(r), codeBits(r));
+	//int count = psigBits(r)/ maxTupsPP(r);
+
+	//just for curr tuple, seem to work?
+	for (int i = 0; i < nAttrs(r); i++){
+		printf("attr is %s\n", tuple[i]);
+		Bits cw = codeword(tuple[i], psigBits(r) , codeBits(r));    //pm bits
+		orBits(psig, cw);
 		
 	}
-
-	return NULL;
+	
+	//now to OR all the attributes in all tuples
+	for (int i = 0; i < maxTupsPP(r); i++){
+		//Tuple tup = getTupleFromPage(r, getPage(r->dataf, ??), i);   //need to get PageID 
+		char **tuples = tupleVals(r, tup);
+		for (int j = 0; j < nAttrs(r); j++){
+			Bits cw = codeword(tuples[j], psigBits(r), codeBits(r));
+			orBits(psig, cw);
+		}
+	}
+	//printf("out of for loop\n");
+	return psig;
 }
 
+// takes query and turns it into tup sig
+Bits pageSigForQuery (Query q){
+	// by Leo
+	char qCopy[strlen(q->qstring)];
+	strcpy(qCopy,q->qstring);
+	char *tok, *rest = qCopy;
+	Bits tsig = newBits(psigBits(q->rel));
+	while ((tok = strtok_r(rest, ",", &rest))) {
+		if (strcmp(tok, "?") != 0) {
+			Bits cw = codeword(tok, psigBits(q->rel), codeBits(q->rel)); 
+			orBits(tsig, cw);				
+		}
+	}
+	return tsig;
+
+
+}
 
 void findPagesUsingPageSigs(Query q)
 {
 	assert(q != NULL);
+	int tup_num = 0;
+	Bits qtsig = pageSigForQuery(q);
+	for (int pid=0; pid<nTsigPages(q->rel); pid++){
+		Page tp = getPage(tsigFile(q->rel), pid);
+		q->nsigpages++;
+		for (int tid = 0; tid<pageNitems(tp); tid++ ){
+			q->nsigs++;
+			Bits ttsig = newBits(tsigBits(q->rel));
+			getBits(tp, tid, ttsig);
+			if (isSubset(ttsig, qtsig)) {
+				setBit(q->pages, tup_num/pageNitems(tp));
+			}
+			tup_num++;
+		}
+	}	
 	
+	// Remove it before submitting this function
+	printf("Matched Pages:"); showBits(q->pages); putchar('\n');
 	
-	
-
-	//TODO
-	setAllBits(q->pages); // remove this
+	//setAllBits(q->pages); // remove this
 }
 
 

@@ -1,17 +1,54 @@
-// tsig.c ... functions on Tuple Signatures (tsig's)
+// psig.c ... functions on page signatures (psig's)
 // part of SIMC signature files
 // Written by John Shepherd, September 2018
 
 #include <unistd.h>
 #include <string.h>
 #include "defs.h"
-#include "tsig.h"
 #include "reln.h"
+#include "query.h"
+#include "psig.h"
 #include "hash.h"
 #include "bits.h"
-#include "util.h"
-#include "hash.h"
+#include "tsig.h"
 
+
+int BitsPerTup (Reln r){
+	return (psigBits(r)/maxTupsPP(r))- (psigBits(r)/maxTupsPP(r))%8;
+}
+
+
+
+/// Try use something like this? to me that seems most logical
+// The psig assigns X amount of bits per page to each tuple
+// Theoretical max tuples per page is maxTupPP
+// assign PsigBits(r)/MaxTupPP to each tuple
+// then when find pages
+// make tuple signiture that is PsigBits(r)/MaxTupPP long (with same formula)
+// Although needs to account for ? as similarly to tsig find (attribute sig for that is 00000...
+// it will then find like so
+//==============================================================
+// 	|	|	|	|	|	|	|	| length per tup = PsigBits(r)/MaxTupPP(r)
+//============================================================== codeBits(R) set per attr
+// ^ 
+//xxxxx	|
+//	|xxxxxxx|
+//		|xxxxxxx|
+//			so on....
+// Check for is subset at teach age of query signutres (whether psig is subset of qsig)
+// iterate through each with Query sig length PsigBits(r)/MaxTupPP
+// say the page isn't full
+//==============================================================
+//000101|1100101|0110110|0000000|0000000|0000000|0000000|0000000| length per tup = PsigBits(r)/MaxTupPP(r)
+//============================================================== codeBits(R) set per attr
+// make signuture	|1010101| 
+// either and bits or just memcpy signiture into correct place to make
+//
+//==============================================================
+//000101|1100101|0110110|1010101|0000000|0000000|0000000|0000000| length per tup = PsigBits(r)/MaxTupPP(r)
+//============================================================== codeBits(R) set per attr
+
+/*
 // by Leo adjusted slides by John Shepard
 // assumes each attribute value bits is shorter than 32 bits?
 Bits codeword(char *attr_value, int m, int k)
@@ -28,9 +65,22 @@ Bits codeword(char *attr_value, int m, int k)
         }
         return cword; // m-bits with k 1-bits and m-k 0-bits
 }
+*/
 
-// make a tuple signature
-Bits makeTupleSig(Reln r, Tuple t)
+/*
+QuerySig = makePageSig(Query)
+Pages = AllZeroBits
+foreach Psig in psigFile {
+    if (Psig matches QuerySig) {
+        PID = data page corresponding to Psig
+        include PID in Pages
+    }
+}
+*/
+
+/*
+// make a page signature (to use in addToRelation?)
+Bits makePageSig(Reln r, Tuple t)
 {
 	// by Leo
 	assert(r != NULL && t != NULL);
@@ -39,75 +89,96 @@ Bits makeTupleSig(Reln r, Tuple t)
 	strcpy(tCopy,t);
 	char *rest = tCopy;
 	char *tok;
-	Bits tsig = newBits(tsigBits(r));
-	int counter = tsigBits(r) - tsigBits(r)/nAttrs(r);
+	int tupbitlen = psigBits(r)/maxTupsPP(r); 
+	Bits tsig = newBits(tupbitlen);
+	int counter = tsigBits(r) - tupbitlen;
 	while ((tok = strtok_r(rest, ",", &rest))){
-		Bits cw = codeword(tok, tsigBits(r)/nAttrs(r), codeBits(r)); 
-		for (int i=0; i<(tsigBits(r)/nAttrs(r)); i++){
-			if (bitIsSet(cw,i)){
-				setBit(tsig,i+counter);
-			}
+                Bits cw = codeword(tok, tupbitlen/nAttrs(r), codeBits(r)); 
+                for (int i=0; i<(tupbitlen/nAttrs(r)); i++){
+                        if (bitIsSet(cw,i)){
+                                setBit(tsig,i+counter);
+                        }
+                }
+                counter -= tupbitlen;
+        }    
+        return tsig;
+}
+
+*/
+
+//get codeword for each attr in each tuple, OR them
+//then generate a bit-string of matching pages 
+Bits makePageSig(Reln r, Tuple t){
+	assert(r != NULL && t != NULL);
+	char **tuple = tupleVals(r,t);
+	Bits psig = newBits(psigBits(r));
+	//printf("Here\n");
+	//printf("NumAttr is %d\n", nAttrs(r));
+	//Bits firstAttr = codeword(tuple[0], psigBits(r), codeBits(r));
+	//int count = psigBits(r)/ maxTupsPP(r);
+
+	//just for curr tuple, seem to work?
+	for (int i = 0; i < nAttrs(r); i++){
+		printf("attr is %s\n", tuple[i]);
+		Bits cw = codeword(tuple[i], psigBits(r) , codeBits(r));    //pm bits
+		orBits(psig, cw);
+		
+	}
+	
+	//now to OR all the attributes in all tuples
+	for (int i = 0; i < maxTupsPP(r); i++){
+		//Tuple tup = getTupleFromPage(r, getPage(r->dataf, ??), i);   //need to get PageID 
+		char **tuples = tupleVals(r, tup);
+		for (int j = 0; j < nAttrs(r); j++){
+			Bits cw = codeword(tuples[j], psigBits(r), codeBits(r));
+			orBits(psig, cw);
 		}
-		counter -= tsigBits(r)/nAttrs(r);
-	}		
-	return tsig;
+	}
+	//printf("out of for loop\n");
+	return psig;
 }
 
 // takes query and turns it into tup sig
-Bits tupSigForQuery (Query q){
+Bits pageSigForQuery (Query q){
 	// by Leo
 	char qCopy[strlen(q->qstring)];
 	strcpy(qCopy,q->qstring);
 	char *tok, *rest = qCopy;
-	Bits tsig = newBits(tsigBits(q->rel));
-	int counter = tsigBits(q->rel) - tsigBits(q->rel)/nAttrs(q->rel);
+	Bits tsig = newBits(psigBits(q->rel));
 	while ((tok = strtok_r(rest, ",", &rest))) {
-		if (tok[0] == '?' && strlen(tok) == 1) {
-			//skip already set to 0's					
+		if (strcmp(tok, "?") != 0) {
+			Bits cw = codeword(tok, psigBits(q->rel), codeBits(q->rel)); 
+			orBits(tsig, cw);				
 		}
-		else {
-			Bits cw = codeword(tok, tsigBits(q->rel)/nAttrs(q->rel), codeBits(q->rel)); 
-			for (int i=0; i<(tsigBits(q->rel)/nAttrs(q->rel)); i++){
-				if (bitIsSet(cw,i)){
-					setBit(tsig,i+counter);
-				}
-			}
-		}
-		counter -= tsigBits(q->rel)/nAttrs(q->rel);
 	}
 	return tsig;
+
+
 }
 
-
-// find "matching" pages using tuple signatures
-
-void findPagesUsingTupSigs(Query q)
+void findPagesUsingPageSigs(Query q)
 {
-	// by Leo
 	assert(q != NULL);
-	// tuple number used for marking page bit
-	int tup_num = 0;
-	// create bit string from Query
-	Bits qtsig = tupSigForQuery(q);
-	// iterate through tsig pages
-	for (int pid=0; pid<nTsigPages(q->rel); pid++){
-		Page tp = getPage(tsigFile(q->rel), pid);
+	int page_num = 0;
+	Bits qtsig = pageSigForQuery(q);
+	for (int pid=0; pid<nPsigPages(q->rel); pid++){
+		Page tp = getPage(psigFile(q->rel), pid);
 		q->nsigpages++;
-		// iterate through tsigs in page
 		for (int tid = 0; tid<pageNitems(tp); tid++ ){
 			q->nsigs++;
-			Bits ttsig = newBits(tsigBits(q->rel));
+			Bits ttsig = newBits(psigBits(q->rel));
 			getBits(tp, tid, ttsig);
-			// test if tsig matches
 			if (isSubset(ttsig, qtsig)) {
-				// set page accordingly
-				setBit(q->pages, tup_num/pageNitems(tp));
+				setBit(q->pages, page_num/pageNitems(tp));
 			}
-			tup_num++;
+			page_num++;
 		}
 	}	
 	
 	// Remove it before submitting this function
 	printf("Matched Pages:"); showBits(q->pages); putchar('\n');
+	
+	//setAllBits(q->pages); // remove this
 }
+
 

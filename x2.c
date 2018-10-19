@@ -3,14 +3,35 @@
 #include <stdio.h>
 #include "defs.h"
 #include "tuple.h"
-#include "tsig.h"
+#include "psig.h"
 #include "bits.h"
 #include "reln.h"
 
 int main(int argc, char **argv)
 {
+
 	Reln r = openRelation("R");
+	Tuple t = readTuple(r, stdin);
+	printf("HERE\n");
+	Bits b = makePageSig(r, t);
+	showBits(b); putchar('\n');
+	
+	
 	/*
+	showBits(b); putchar('\n');
+	
+	int n0, n1, tot; n0 = n1 = tot = 0;
+	for (int i = 0; i < tsigBits(r); i++) {
+		if (bitIsSet(b,i)) n1++; else n0++;
+		tot++;
+	}
+	printf("%d total, %d set, %d zero\n", tot, n1, n0);
+	*/
+	return 0;
+	
+	/*
+	Reln r = openRelation("R");
+	
 	for (int pid=0; pid<nPages(r); pid++){
 		Page p = getPage(dataFile(r), pid);
 		Page tp = getPage(tsigFile(r),0);
@@ -29,7 +50,7 @@ int main(int argc, char **argv)
 		}
 		putPage(tsigFile(r),0,tp);
 	}
-	*/	
+	
 	Page testp = getPage(tsigFile(r),0);
 	Bits test = newBits(64);
 	getBits(testp, 0, test);
@@ -47,4 +68,5 @@ int main(int argc, char **argv)
 	getBits(testp, 4, test);
 	showBits(test);
 	return 0;
+	*/
 }
