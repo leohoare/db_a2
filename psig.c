@@ -10,42 +10,6 @@
 #include "tsig.h"
 
 
-int BitsPerTup (Reln r){
-	return (psigBits(r)/maxTupsPP(r))- (psigBits(r)/maxTupsPP(r))%8;
-}
-
-
-
-/// Try use something like this? to me that seems most logical
-// The psig assigns X amount of bits per page to each tuple
-// Theoretical max tuples per page is maxTupPP
-// assign PsigBits(r)/MaxTupPP to each tuple
-// then when find pages
-// make tuple signiture that is PsigBits(r)/MaxTupPP long (with same formula)
-// Although needs to account for ? as similarly to tsig find (attribute sig for that is 00000...
-// it will then find like so
-//==============================================================
-// 	|	|	|	|	|	|	|	| length per tup = PsigBits(r)/MaxTupPP(r)
-//============================================================== codeBits(R) set per attr
-// ^ 
-//xxxxx	|
-//	|xxxxxxx|
-//		|xxxxxxx|
-//			so on....
-// Check for is subset at teach age of query signutres (whether psig is subset of qsig)
-// iterate through each with Query sig length PsigBits(r)/MaxTupPP
-// say the page isn't full
-//==============================================================
-//000101|1100101|0110110|0000000|0000000|0000000|0000000|0000000| length per tup = PsigBits(r)/MaxTupPP(r)
-//============================================================== codeBits(R) set per attr
-// make signuture	|1010101| 
-// either and bits or just memcpy signiture into correct place to make
-//
-//==============================================================
-//000101|1100101|0110110|1010101|0000000|0000000|0000000|0000000| length per tup = PsigBits(r)/MaxTupPP(r)
-//============================================================== codeBits(R) set per attr
-
-
 Bits makePageSig(Reln r, Tuple t)
 {
         // by Leo
@@ -55,19 +19,12 @@ Bits makePageSig(Reln r, Tuple t)
         strcpy(tCopy,t);
         char *rest = tCopy;
         char *tok;
-	int tupbitlen = psigBits(r)/maxTupsPP(r); 
-	Bits tsig = newBits(tupbitlen);
-	int counter = tsigBits(r) - tupbitlen;
+	Bits pagesig = newBits(psigBits(r));
 	while ((tok = strtok_r(rest, ",", &rest))){
-                Bits cw = codeword(tok, tupbitlen/nAttrs(r), codeBits(r)); 
-                for (int i=0; i<(tupbitlen/nAttrs(r)); i++){
-                        if (bitIsSet(cw,i)){
-                                setBit(tsig,i+counter);
-                        }
-                }
-                counter -= tupbitlen;
+                Bits cw = codeword(tok, psigBits(r), codeBits(r)); 
+        	orBits(pagesig,cw);
         }    
-        return tsig;
+        return pagesig;
 }
 
 
@@ -76,8 +33,32 @@ Bits makePageSig(Reln r, Tuple t)
 void findPagesUsingPageSigs(Query q)
 {
 	assert(q != NULL);
+	Bits querysig = newBits(psigBits(q->rel));
+	char *tok, *rest = q->qstring;	
+	while ((tok = strtok_r(rest, ",", &rest))) {
+		if (tok[0]=='?' && strlen(tok) ==1){
+			// dont set any bits
+		}
+		else {
+			Bits cw = codeword(tok, psigBits(q->rel), codeBits(q->rel));
+			orBits(querysig, cw);
+		}
+	}
 	
-	
+
+	for (int pid = 0; pid<nPsigPages(q->rel); pid++){
+		Page pp = getPage(psigFile(q->rel),pid);
+		q->nsigpages++;
+		for (int psid = 0; psid < pageNitems(pp); psid++){
+			q->nsigs++;
+			Bits psig = newBits(psigBits(q->rel));
+			getBits(pp, psid, psig);
+			if (isSubset(psig, querysig)){
+				setBit(q->pages, psid + pid*maxPsigsPP(q->rel));
+			}
+			
+		}
+	}
 	
 
 	//TODO

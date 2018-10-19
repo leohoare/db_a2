@@ -12,6 +12,7 @@
 #include "tsig.h"
 #include "bits.h"
 #include "hash.h"
+#include "psig.h"
 // open a file with a specified suffix
 // - always open for both reading and writing
 
@@ -116,8 +117,9 @@ void closeRelation(Reln r)
 PageID addToRelation(Reln r, Tuple t)
 {
 	assert(r != NULL && t != NULL && strlen(t) == tupSize(r));
-	Page p;  PageID pid;
-	Page tp;    PageID tid;
+	Page p;  	PageID pid;
+	Page tp; 	PageID tid;
+	Page pp; 	PageID ppid;
 	RelnParams *rp = &(r->params);
 	
 	// add tuple to last page
@@ -158,23 +160,29 @@ PageID addToRelation(Reln r, Tuple t)
 	
 
 	// compute page signature and add to psigf
-	/*
-	pid = rp->psigNpages-1;
-	pp = getPage(r->psif,pid);
+	
+	ppid = rp->psigNpages-1;
+	pp = getPage(r->psigf,ppid);
+	Bits add_sig = makePageSig(r, t);
+	Bits old_sig = newBits(psigBits(r));
 	if (pageNitems(pp) == rp->psigPP){
 		addPage(r->psigf);
-		
 		rp->psigNpages++;
-		pid++;
+		ppid++;
 		free(pp);
 		pp = newPage();
 		if (pp == NULL) return NO_PAGE;
+		//putBits(pp, pageNitems(pp),
 	}
-	Bits add_sig = makePageSig(r, t);
+	else {
+		getBits(pp, pageNitems(pp)-1, old_sig);
+		orBits(add_sig,old_sig);
+	}
 	putBits(pp, pageNitems(pp), add_sig);
-	addOneI 
-	}
-	*/
+	rp->npsigs++;
+	addOneItem(pp);
+	putPage(r->psigf, ppid, pp);
+	
 	//TODO
 
 	// use page signature to update bit-slices
