@@ -68,6 +68,5 @@ void findPagesUsingPageSigs(Query q)
 			}
 		}
 	}
-	printf("Matched Pages:"); showBits(q->pages); putchar('\n');
 }
 
