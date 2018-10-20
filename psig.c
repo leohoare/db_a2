@@ -24,7 +24,7 @@ Bits makePageSig(Reln r, Tuple t)
                 Bits cw = codeword(tok, psigBits(r), codeBits(r)); 
         	orBits(pagesig,cw);
         }    
-        return pagesig;
+	return pagesig;
 }
 
 
@@ -52,7 +52,12 @@ void findPagesUsingPageSigs(Query q)
 		for (int psid = 0; psid < pageNitems(pp); psid++){
 			q->nsigs++;
 			Bits psig = newBits(psigBits(q->rel));
+			if (pp) {printf("HELLO\n");}
 			getBits(pp, psid, psig);
+			//showBits(psig);
+			//printf("\n\n");
+			//showBits(querysig);
+			//printf("\n\n");
 			if (isSubset(psig, querysig)){
 				setBit(q->pages, psid + pid*maxPsigsPP(q->rel));
 			}

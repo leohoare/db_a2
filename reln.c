@@ -58,8 +58,8 @@ Status newRelation(char *name, Count nattrs, float pF,
 	addPage(r->psigf); p->psigNpages = 1; p->npsigs = 0;
 	addPage(r->bsigf); p->bsigNpages = 1; p->nbsigs = 0; // replace this
 	// Create a file containing "pm" all-zeroes bit-strings,
-    // each of which has length "bm" bits
-	//TODO
+    	// each of which has length "bm" bits
+	// DONT NEED TO DO??
 	closeRelation(r);
 	return 0;
 }
@@ -174,7 +174,7 @@ PageID addToRelation(Reln r, Tuple t)
                 	free(pp);
                 	pp = newPage();
                 	if (pp == NULL) return NO_PAGE;
-		// just add new sig
+		// just add new sig (meant to be empty)
 		}
 		else {
 	
@@ -187,9 +187,8 @@ PageID addToRelation(Reln r, Tuple t)
 		getBits(pp, pageNitems(pp)-1, old_sig);
 		orBits(add_sig,old_sig);
 	}
-	putBits(pp, pageNitems(pp), add_sig);
+	putBits(pp, pageNitems(pp)-1, add_sig);
 	putPage(r->psigf, ppid, pp);
-	//TODO
 
 	// use page signature to update bit-slices
 
