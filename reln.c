@@ -152,8 +152,6 @@ PageID addToRelation(Reln r, Tuple t)
 	putPage(r->dataf, pid, p);
 
 	// compute tuple signature and add to tsigf
-	
-	// by Leo
 	tid = rp->tsigNpages-1;
 	tp = getPage(r->tsigf,tid);	
 	if (pageNitems(tp) == rp->tsigPP){
@@ -176,43 +174,35 @@ PageID addToRelation(Reln r, Tuple t)
 	pp = getPage(r->psigf,ppid);
 	Bits add_sig = makePageSig(r, t);
 	Bits old_sig = newBits(psigBits(r));
-	// ADD NEW psig
-	// deliberately refers to p instead of pp
 	if (tupsInPage == rp->tupPP || tupsInPage == 0 ){
-	        // ADD new page
+		// start new sig
 		if (pageNitems(pp) == rp->psigPP){
-            		
+            		// add new page	
 			addPage(r->psigf);
                		rp->psigNpages++;
                		ppid++;
                 	free(pp);
                 	pp = newPage();
                 	if (pp == NULL) return NO_PAGE;
-		// just add new sig (meant to be empty)
 		}
-		else {
-	
-		}
-		
+		// else just add new sig to page	
 		rp->npsigs++;
 		addOneItem(pp);
 	}
-	// merge signatures;
 	else {
+		// merge current signiture
 		getBits(pp, pageNitems(pp)-1, old_sig);
 		orBits(add_sig,old_sig);
 	}
-	
 	putBits(pp, pageNitems(pp)-1, add_sig);
 	// extract page num for bsig	
 	int pagenum = ppid * rp->psigPP + pageNitems(pp)-1;
 	putPage(r->psigf, ppid, pp);
 
 
-	// params we have
-	// add_sig = page signiture
-	// pagenum ppid*rp->psigPP+pageNitems(pp)-1     0,1,2....	
-
+	// function to set bsigs
+	// loops through all bsigs and updates them according 
+	// to page sig being altered
 	bp = getPage(r->bsigf,0); // useless decloration but anyway
 	for (int bid=0; bid < rp->pm; bid++) {
 		if (bitIsSet(add_sig, bid) == 1) {

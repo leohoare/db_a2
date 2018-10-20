@@ -81,15 +81,14 @@ void scanAndDisplayMatchingTuples(Query q, char* file_name)
 				while((t_tok = strtok_r(t_rest, ",", &t_rest)) &&
 					 (q_tok = strtok_r(q_rest, ",", &q_rest))){
 					if (q_tok[0] == '?' && strlen(q_tok)==1) {
+						
 						// continue -> matches anything	
 					}
 					else {
 						if (strcmp(q_tok,t_tok) == 0){
 							// continue
-							// printf("match\n");		
 						}
 						else {
-							// Tuple doesn't match
 							tuple_match = false;
 							break;
 						}
@@ -100,9 +99,7 @@ void scanAndDisplayMatchingTuples(Query q, char* file_name)
 			}
 			// if no tuples match -> false match
 			if (false_match == true) { q->nfalse++; }
-			
 		}
-		// else ignore
 	}	
 }
 

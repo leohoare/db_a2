@@ -42,8 +42,6 @@ Bits newBits(int nbits)
 
 void freeBits(Bits b)
 {
-	// needs fixing
-	// written by Leo
 	//free(b->bitstring);
 	free(b);
 }
@@ -52,7 +50,6 @@ void freeBits(Bits b)
 
 Bool bitIsSet(Bits b, int position)
 {
-	// written by Leo
 	assert(b != NULL);
 	assert(0 <= position && position < b->nbits);
 
@@ -64,7 +61,6 @@ Bool bitIsSet(Bits b, int position)
 
 Bool isSubset(Bits b1, Bits b2)
 {
-	// written by Leo
 	assert(b1 != NULL && b2 != NULL);
 	assert(b1->nbytes == b2->nbytes);
 	for (int i=0; i<b2->nbits; i++){
@@ -79,7 +75,6 @@ Bool isSubset(Bits b1, Bits b2)
 
 void setBit(Bits b, int position)
 {
-	// written by Leo
 	assert(b != NULL);
 	assert(0 <= position && position < b->nbits);
 	b->bitstring[position/8] |= (1 << (position%8));
@@ -88,7 +83,6 @@ void setBit(Bits b, int position)
 // set all bits to 1
 void setAllBits(Bits b)
 {
-	// written by Leo
 	assert(b != NULL);
 	for (int i=0; i<b->nbits; i++){
 		b->bitstring[i/8] |= (1 << (i%8));
@@ -99,7 +93,6 @@ void setAllBits(Bits b)
 
 void unsetBit(Bits b, int position)
 {
-	// written by Leo
 	assert(b != NULL);
 	assert(0 <= position && position < b->nbits);
 	b->bitstring[position/8] &= ~(1 << (position%8));
@@ -109,7 +102,6 @@ void unsetBit(Bits b, int position)
 
 void unsetAllBits(Bits b)
 {
-	// written by Leo
 	assert(b != NULL);
 	memset(b->bitstring, 0, b->nbytes);
 }
@@ -118,7 +110,6 @@ void unsetAllBits(Bits b)
 
 void andBits(Bits b1, Bits b2)
 {
-	// written by leo
 	assert(b1 != NULL && b2 != NULL);
 	assert(b1->nbytes == b2->nbytes);
 	for (int i=0; i<b1->nbits; i++){
@@ -135,7 +126,6 @@ void andBits(Bits b1, Bits b2)
 
 void orBits(Bits b1, Bits b2)
 {
-	// written by Leo
 	assert(b1 != NULL && b2 != NULL);
 	assert(b1->nbytes == b2->nbytes);
 	for (int i=0; i<b1->nbits; i++){
@@ -152,7 +142,6 @@ void orBits(Bits b1, Bits b2)
 
 void getBits(Page p, Offset pos, Bits b)
 {
-	// written by Leo
 	assert(p!=NULL && b!=NULL);
 	Byte *ptr = addrInPage(p,pos,sizeof(Byte)*b->nbytes);		
 	memcpy(b->bitstring, ptr, sizeof(Byte)*(b->nbytes));
@@ -164,7 +153,6 @@ void getBits(Page p, Offset pos, Bits b)
 
 void putBits(Page p, Offset pos, Bits b)
 {
-	// by leo
 	assert(p!=NULL && b!=NULL);
 	Byte *ptr = addrInPage(p,pos,sizeof(Byte)*b->nbytes);		
 	memcpy(ptr, b->bitstring, sizeof(Byte)*b->nbytes);
@@ -179,7 +167,6 @@ void putBits(Page p, Offset pos, Bits b)
 void showBits(Bits b)
 {
 	assert(b != NULL);
-    //printf("(%d,%d)",b->nbits,b->nbytes);
 	for (int i = b->nbytes-1; i >= 0; i--) {
 		for (int j = 7; j >= 0; j--) {
 			Byte mask = (1 << j);

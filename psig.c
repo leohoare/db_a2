@@ -10,6 +10,10 @@
 #include "tsig.h"
 
 
+
+
+// function to make a page signiture from tupple
+// uses codeword function from tsig (adapted from lecture)
 Bits makePageSig(Reln r, Tuple t)
 {
         // by Leo
@@ -27,7 +31,7 @@ Bits makePageSig(Reln r, Tuple t)
 	return pagesig;
 }
 
-
+// similar to makePageSig but specificalyl from query strings
 Bits makePQuerySig(Query q){
 	Bits querysig = newBits(psigBits(q->rel));
 	char *tok, *rest = q->qstring;	
@@ -44,7 +48,9 @@ Bits makePQuerySig(Query q){
 }
 
 
-
+// iterates through all page signitures 
+// checks if query is subset of page signiture
+// records states
 void findPagesUsingPageSigs(Query q)
 {
 	assert(q != NULL);

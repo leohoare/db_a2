@@ -30,9 +30,9 @@ Bits codeword(char *attr_value, int m, int k)
 }
 
 // make a tuple signature
+// using codeword for each attribute
 Bits makeTupleSig(Reln r, Tuple t)
 {
-	// by Leo
 	assert(r != NULL && t != NULL);
 	// iterate through each tuple
 	char tCopy[strlen(t)];
@@ -44,7 +44,7 @@ Bits makeTupleSig(Reln r, Tuple t)
 	while ((tok = strtok_r(rest, ",", &rest))){
 		Bits cw = codeword(tok, tsigBits(r)/nAttrs(r), codeBits(r)); 
 		for (int i=0; i<(tsigBits(r)/nAttrs(r)); i++){
-			if (bitIsSet(cw,i)){
+			if (bitIsSet(cw,i)==1){
 				setBit(tsig,i+counter);
 			}
 		}
@@ -54,6 +54,8 @@ Bits makeTupleSig(Reln r, Tuple t)
 }
 
 // takes query and turns it into tup sig
+// similar to maketuplesig but accounts for case of ?
+// in retrospective... could have combined these functions
 Bits tupSigForQuery (Query q){
 	// by Leo
 	char qCopy[strlen(q->qstring)];
@@ -68,7 +70,7 @@ Bits tupSigForQuery (Query q){
 		else {
 			Bits cw = codeword(tok, tsigBits(q->rel)/nAttrs(q->rel), codeBits(q->rel)); 
 			for (int i=0; i<(tsigBits(q->rel)/nAttrs(q->rel)); i++){
-				if (bitIsSet(cw,i)){
+				if (bitIsSet(cw,i)==1){
 					setBit(tsig,i+counter);
 				}
 			}
@@ -79,13 +81,11 @@ Bits tupSigForQuery (Query q){
 }
 
 
-// find "matching" pages using tuple signatures
-// CALCULATION IS WRONG
-// e.g. ./select  R  1000001,?,?,?  t
-// scans 15...
+
+// Function to find pages using tuple signitures
+// iterates through all tsigs, and checks if subset
 void findPagesUsingTupSigs(Query q)
 {
-	// by Leo
 	assert(q != NULL);
 	// tuple number used for marking page bit
 	int tup_num = 0;
@@ -109,6 +109,4 @@ void findPagesUsingTupSigs(Query q)
 		}
 	}	
 	
-	// Remove it before submitting this function
-	printf("Matched Pages:"); showBits(q->pages); putchar('\n');
 }
