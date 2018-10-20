@@ -11,7 +11,7 @@
 int main(int argc, char **argv)
 {
 	Reln r = openRelation("R");
-	
+	printf("%i\n",bsigFile(r));	
 	for (int pid=0; pid<nPages(r); pid++){
 		Page p = getPage(dataFile(r), pid);
 		Page tp = getPage(psigFile(r),0);

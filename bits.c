@@ -42,8 +42,9 @@ Bits newBits(int nbits)
 
 void freeBits(Bits b)
 {
+	// needs fixing
 	// written by Leo
-	free(b->bitstring);
+	//free(b->bitstring);
 	free(b);
 }
 

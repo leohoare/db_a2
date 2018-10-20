@@ -57,9 +57,20 @@ Status newRelation(char *name, Count nattrs, float pF,
 	addPage(r->tsigf); p->tsigNpages = 1; p->ntsigs = 0;
 	addPage(r->psigf); p->psigNpages = 1; p->npsigs = 0;
 	addPage(r->bsigf); p->bsigNpages = 1; p->nbsigs = 0; // replace this
-	// Create a file containing "pm" all-zeroes bit-strings,
-    	// each of which has length "bm" bits
-	// DONT NEED TO DO??
+	// function to add in all bsig files
+	Page bp = getPage(r->bsigf,0);
+	//int page_counter = 0;
+	for (int bid=0; bid < p->pm; bid++){
+	        if (pageNitems(bp) == p->bsigPP) {
+	                addPage(r->bsigf);
+        	        p->bsigNpages++;
+                	free(bp);
+                	bp = newPage();
+                	if (bp == NULL) return NO_PAGE;
+        	}
+        	addOneItem(bp);
+        	p->nbsigs++;
+	}	
 	closeRelation(r);
 	return 0;
 }
@@ -120,6 +131,7 @@ PageID addToRelation(Reln r, Tuple t)
 	Page p;  	PageID pid;
 	Page tp; 	PageID tid;
 	Page pp; 	PageID ppid;
+	Page bp;
 	RelnParams *rp = &(r->params);
 	
 	// add tuple to last page
@@ -136,12 +148,12 @@ PageID addToRelation(Reln r, Tuple t)
 	}
 	addTupleToPage(r, p, t);
 	rp->ntups++;  //written to disk in closeRelation()
+	int tupsInPage = pageNitems(p)-1;
 	putPage(r->dataf, pid, p);
 
 	// compute tuple signature and add to tsigf
 	
 	// by Leo
-	
 	tid = rp->tsigNpages-1;
 	tp = getPage(r->tsigf,tid);	
 	if (pageNitems(tp) == rp->tsigPP){
@@ -165,10 +177,12 @@ PageID addToRelation(Reln r, Tuple t)
 	Bits add_sig = makePageSig(r, t);
 	Bits old_sig = newBits(psigBits(r));
 	// ADD NEW psig
-	if (pageNitems(p) == rp->tupPP || pageNitems(p) == 0 ){
+	// deliberately refers to p instead of pp
+	if (tupsInPage == rp->tupPP || tupsInPage == 0 ){
 	        // ADD new page
 		if (pageNitems(pp) == rp->psigPP){
-            		addPage(r->psigf);
+            		
+			addPage(r->psigf);
                		rp->psigNpages++;
                		ppid++;
                 	free(pp);
@@ -179,6 +193,7 @@ PageID addToRelation(Reln r, Tuple t)
 		else {
 	
 		}
+		
 		rp->npsigs++;
 		addOneItem(pp);
 	}
@@ -187,12 +202,29 @@ PageID addToRelation(Reln r, Tuple t)
 		getBits(pp, pageNitems(pp)-1, old_sig);
 		orBits(add_sig,old_sig);
 	}
+	
 	putBits(pp, pageNitems(pp)-1, add_sig);
+	// extract page num for bsig	
+	int pagenum = ppid * rp->psigPP + pageNitems(pp)-1;
 	putPage(r->psigf, ppid, pp);
 
-	// use page signature to update bit-slices
 
-	//TODO
+	// params we have
+	// add_sig = page signiture
+	// pagenum ppid*rp->psigPP+pageNitems(pp)-1     0,1,2....	
+
+	bp = getPage(r->bsigf,0); // useless decloration but anyway
+	for (int bid=0; bid < rp->pm; bid++) {
+		if (bitIsSet(add_sig, bid) == 1) {
+			bp = getPage(r->bsigf,bid/rp->bsigPP);
+			Bits newBsig = newBits(rp->bm);
+			getBits(bp, bid%rp->bsigPP, newBsig);
+			setBit(newBsig, pagenum);
+			putBits(bp, bid%rp->bsigPP, newBsig);
+			putPage(r->bsigf, bid/rp->bsigPP, bp);
+		}
+		
+	}
 
 	return nPages(r)-1;
 }

@@ -28,11 +28,7 @@ Bits makePageSig(Reln r, Tuple t)
 }
 
 
-
-
-void findPagesUsingPageSigs(Query q)
-{
-	assert(q != NULL);
+Bits makePQuerySig(Query q){
 	Bits querysig = newBits(psigBits(q->rel));
 	char *tok, *rest = q->qstring;	
 	while ((tok = strtok_r(rest, ",", &rest))) {
@@ -44,7 +40,15 @@ void findPagesUsingPageSigs(Query q)
 			orBits(querysig, cw);
 		}
 	}
-	
+	return querysig;
+}
+
+
+
+void findPagesUsingPageSigs(Query q)
+{
+	assert(q != NULL);
+	Bits querysig = makePQuerySig(q);	
 	
 	for (int pid = 0; pid<nPsigPages(q->rel); pid++){
 		Page pp = getPage(psigFile(q->rel),pid);
@@ -52,19 +56,12 @@ void findPagesUsingPageSigs(Query q)
 		for (int psid = 0; psid < pageNitems(pp); psid++){
 			q->nsigs++;
 			Bits psig = newBits(psigBits(q->rel));
-			if (pp) {printf("HELLO\n");}
 			getBits(pp, psid, psig);
-			//showBits(psig);
-			//printf("\n\n");
-			//showBits(querysig);
-			//printf("\n\n");
 			if (isSubset(psig, querysig)){
 				setBit(q->pages, psid + pid*maxPsigsPP(q->rel));
 			}
 		}
 	}
-
-	//TODO
-	//setAllBits(q->pages); // remove this
+	printf("Matched Pages:"); showBits(q->pages); putchar('\n');
 }
 

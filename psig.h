@@ -12,5 +12,6 @@
 
 Bits makePageSig(Reln, Tuple);
 void findPagesUsingPageSigs(Query);
-
+Bits makePageSig(Reln, Tuple);
+Bits makePQuerySig(Query);
 #endif
